@@ -18,25 +18,25 @@ public class CollectionExample implements Example {
         ConcurrentHashMap<String, Integer> chm = new ConcurrentHashMap<>();
         ConcurrentSkipListMap<String, Integer> cslm = new ConcurrentSkipListMap<>();
 
-        hm.put("슈", 1);
-        hm.put("퍼", 2);
-        hm.put("캣", 3);
+        hm.put("A", 1);
+        hm.put("B", 2);
+        hm.put("C", 3);
 
-        tm.put("슈", 1);
-        tm.put("퍼", 2);
-        tm.put("캣", 3);
+        tm.put("A", 1);
+        tm.put("B", 2);
+        tm.put("C", 3);
 
-        lhm.put("슈", 1);
-        lhm.put("퍼", 2);
-        lhm.put("캣", 3);
+        lhm.put("A", 1);
+        lhm.put("B", 2);
+        lhm.put("C", 3);
 
-        chm.put("슈", 1);
-        chm.put("퍼", 2);
-        chm.put("캣", 3);
+        chm.put("A", 1);
+        chm.put("B", 2);
+        chm.put("C", 3);
 
-        cslm.put("슈", 1);
-        cslm.put("퍼", 2);
-        cslm.put("캣", 3);
+        cslm.put("A", 1);
+        cslm.put("B", 2);
+        cslm.put("C", 3);
 
         logger.info("hash map - {}", hm);
         logger.info("tree map - {}", tm);
