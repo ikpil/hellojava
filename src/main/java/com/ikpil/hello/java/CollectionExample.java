@@ -18,30 +18,33 @@ public class CollectionExample implements Example {
         ConcurrentHashMap<String, Integer> chm = new ConcurrentHashMap<>();
         ConcurrentSkipListMap<String, Integer> cslm = new ConcurrentSkipListMap<>();
 
-        hm.put("A", 1);
-        hm.put("B", 2);
-        hm.put("C", 3);
+        String key1 = "가";
+        String key2 = "나";
+        String key3 = "다";
 
-        tm.put("A", 1);
-        tm.put("B", 2);
-        tm.put("C", 3);
-
-        lhm.put("A", 1);
-        lhm.put("B", 2);
-        lhm.put("C", 3);
-
-        chm.put("A", 1);
-        chm.put("B", 2);
-        chm.put("C", 3);
-
-        cslm.put("A", 1);
-        cslm.put("B", 2);
-        cslm.put("C", 3);
-
+        hm.put(key1, 1);
+        hm.put(key2, 2);
+        hm.put(key3, 3);
         logger.info("hash map - {}", hm);
+
+        tm.put(key1, 1);
+        tm.put(key2, 2);
+        tm.put(key3, 3);
         logger.info("tree map - {}", tm);
+
+        lhm.put(key1, 1);
+        lhm.put(key2, 2);
+        lhm.put(key3, 3);
         logger.info("linked hash map - {}", lhm);
+
+        chm.put(key1, 1);
+        chm.put(key2, 2);
+        chm.put(key3, 3);
         logger.info("thread safe hash map - {}", chm);
+
+        cslm.put(key1, 1);
+        cslm.put(key2, 2);
+        cslm.put(key3, 3);
         logger.info("thread safe skip list map - {}", cslm);
     }
 }
