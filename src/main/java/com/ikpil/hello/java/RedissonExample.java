@@ -101,28 +101,27 @@ public class RedissonExample implements Example {
      * -  1 thread, 4초간 13141회 수신, 초당 약 3200회 수신 가능
      * -  8 thread, 4초간 17021회 수신, 초당 약 4200회 수신 가능
      * - 10 thread, 4초간 15209회 수신, 초당 약 3800회 수신 가능
-     *
+     * <p>
      * 테스트 케이스 2
-     *
-     *
+     * <p>
+     * <p>
      * 테스트 결과
-     *
+     * <p>
      * publish -> publishAsync 가 10% ~ 20% 더 빠른 결과
      * 하나의 클라이언트가 수신 토픽 갯수를 늘린다고, 수신 반응이 좋아지지 않음
      * 하나의 클라이언트가 송신 토픽 갯수를 늘린다고, 송신 반응이 좋아지지 않음
-     *
+     * <p>
      * 복수의 클라이언트로 쓰레드의 갯수를 늘리면 반응은 좋아지지만,
      * 일반적으로 사용할 수 없는 구조(송신 패킷 순서가 의도와 달라질 수 있음)
-     *
-     *
+     * <p>
+     * <p>
      * 결론
-     *
+     * <p>
      * 효율 측면에서
      * 하나의 클라이언트로 처리하는게 최고 효율
-     *
+     * <p>
      * 성능 측면에서
      * 복수의 클라이언트가 서로 다른 토픽으로 분리해서 받는다면, 최고 성능
-     *
      */
     // publish/subscribe 예제
     private void publishOrSubscribe(RedissonClient client) {
@@ -144,46 +143,20 @@ public class RedissonExample implements Example {
         logger.info("subscribe - key({}) count({})", topicName, countdown);
 
 
-
+        // 쓰레드 돌림
         ArrayList<Thread> threads = new ArrayList<>();
         for (int threadIdx = 0; threadIdx < threadCnt; ++threadIdx) {
-            Thread t = new Thread(() -> {
-                // 퍼블리쉬 시작
-                RedissonClient publishClient = create(mainHost);
-
-                ArrayList<RTopic> topics = new ArrayList<>();
-                for (int i = 0; i < threadCnt; ++i) {
-                    RTopic topic = publishClient.getTopic(topicName + i);
-                    topics.add(topic);
-                }
-
-                for (int i = 0; runnable.get() && i < countdown / threadCnt + 1; ++i) {
-                    topics.get(i % topics.size()).publishAsync("z");
-                    //publishTopic.publish("z");
-
-                    try {
-                        // 10번당 한번씩 쉰다
-                        if (0 == (i % 10)) {
-                            Thread.sleep(0L, 1);
-                        }
-                    } catch (Exception e) {
-                        logger.error("", e);
-                    }
-                }
-
-                publishClient.shutdown();
-            });
-
+            Thread t = new Thread(() -> publisher(
+                    runnable, topicName, threadCnt, countdown
+            ));
             threads.add(t);
         }
 
-        // 1초간 대기
         try {
             for (Thread t : threads) {
                 t.start();
             }
 
-            // 4초간 대기
             Thread.sleep(4000L);
             runnable.compareAndSet(true, false);
 
@@ -192,5 +165,33 @@ public class RedissonExample implements Example {
         }
 
         logger.info("published - key({}) send({}) recv({})", topicName, countdown, listenCnt.get());
+    }
+
+    // topic publisher
+    private void publisher(AtomicBoolean runnable, String topicName, int threadCnt, int countdown) {
+        // 퍼블리쉬 시작
+        RedissonClient publishClient = create(mainHost);
+
+        ArrayList<RTopic> topics = new ArrayList<>();
+        for (int i = 0; i < threadCnt; ++i) {
+            RTopic topic = publishClient.getTopic(topicName + i);
+            topics.add(topic);
+        }
+
+        for (int i = 0; runnable.get() && i < countdown / threadCnt + 1; ++i) {
+            topics.get(i % topics.size()).publishAsync("z");
+            //publishTopic.publish("z");
+
+            try {
+                // 10번당 한번씩 쉰다
+                if (0 == (i % 10)) {
+                    Thread.sleep(0L, 1);
+                }
+            } catch (Exception e) {
+                logger.error("", e);
+            }
+        }
+
+        publishClient.shutdown();
     }
 }
