@@ -1,20 +1,17 @@
 package com.ikpil.hello.java;
 
-import org.redisson.PubSubMessageListener;
 import org.redisson.Redisson;
-import org.redisson.api.RTopic;
-import org.redisson.api.RedissonClient;
-import org.redisson.api.listener.MessageListener;
+import org.redisson.api.*;
 import org.redisson.client.RedisConnectionException;
+import org.redisson.client.protocol.ScoredEntry;
 import org.redisson.config.Config;
 import org.redisson.config.TransportMode;
-import org.redisson.pubsub.CountDownLatchPubSub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -36,7 +33,10 @@ public class RedissonExample implements Example {
             consume(this::connectAndShutdown);
             consume(this::getOrSet);
             consume(this::publishOrSubscribe);
+            consume(this::sortedSet);
+            consume(this::scoredSortedSet);
         } catch (Exception e) {
+            // 레디스를 로컬에 구성하고 테스트 할 것
             logger.error("", e);
         }
     }
@@ -60,37 +60,37 @@ public class RedissonExample implements Example {
     }
 
     private void consume(Consumer<RedissonClient> consumer) throws RedisConnectionException {
-        RedissonClient client = null;
+        RedissonClient redisson = null;
         try {
-            client = create(mainHost);
-            if (null == client) {
+            redisson = create(mainHost);
+            if (null == redisson) {
                 return;
             }
 
-            consumer.accept(client);
+            consumer.accept(redisson);
 
         } finally {
-            if (null == client) {
+            if (null == redisson) {
                 logger.error("redisson creation failed");
             } else {
-                client.shutdown();
+                redisson.shutdown();
             }
         }
     }
 
     // 케넥션 테스트, 할 일이 없다
-    private void connectAndShutdown(RedissonClient client) {
+    private void connectAndShutdown(RedissonClient redisson) {
         // ....
     }
 
     // get set 예제
-    private void getOrSet(RedissonClient client) {
+    private void getOrSet(RedissonClient redisson) {
         String key = "getOrSet";
         long setValue = 1234L;
-        client.getBucket(key).set(setValue, 10, TimeUnit.SECONDS);
+        redisson.getBucket(key).set(setValue, 10, TimeUnit.SECONDS);
         logger.info("redis - set getOrSet {}", setValue);
 
-        long getValue = (Long) client.getBucket(key).get();
+        long getValue = (Long) redisson.getBucket(key).get();
         logger.info("redis - get getOrSet {}", getValue);
     }
 
@@ -101,25 +101,25 @@ public class RedissonExample implements Example {
      * -  1 thread, 4초간 13141회 수신, 초당 약 3200회 수신 가능
      * -  8 thread, 4초간 17021회 수신, 초당 약 4200회 수신 가능
      * - 10 thread, 4초간 15209회 수신, 초당 약 3800회 수신 가능
-     * <p>
+     * -
      * 테스트 케이스 2
-     * <p>
-     * <p>
+     * -
+     * -
      * 테스트 결과
-     * <p>
+     * -
      * publish -> publishAsync 가 10% ~ 20% 더 빠른 결과
      * 하나의 클라이언트가 수신 토픽 갯수를 늘린다고, 수신 반응이 좋아지지 않음
      * 하나의 클라이언트가 송신 토픽 갯수를 늘린다고, 송신 반응이 좋아지지 않음
-     * <p>
+     * -
      * 복수의 클라이언트로 쓰레드의 갯수를 늘리면 반응은 좋아지지만,
      * 일반적으로 사용할 수 없는 구조(송신 패킷 순서가 의도와 달라질 수 있음)
-     * <p>
-     * <p>
+     * -
+     * -
      * 결론
-     * <p>
+     * -
      * 효율 측면에서
      * 하나의 클라이언트로 처리하는게 최고 효율
-     * <p>
+     * -
      * 성능 측면에서
      * 복수의 클라이언트가 서로 다른 토픽으로 분리해서 받는다면, 최고 성능
      */
@@ -130,7 +130,7 @@ public class RedissonExample implements Example {
         // 카운트 다운 등록
         final int countdown = 100000;
         AtomicLong listenCnt = new AtomicLong();
-        AtomicBoolean runnable = new AtomicBoolean(true);
+        AtomicBoolean isExeuting = new AtomicBoolean(true);
 
         // 리스너 등록
         int threadCnt = 1;
@@ -147,7 +147,7 @@ public class RedissonExample implements Example {
         ArrayList<Thread> threads = new ArrayList<>();
         for (int threadIdx = 0; threadIdx < threadCnt; ++threadIdx) {
             Thread t = new Thread(() -> publisher(
-                    runnable, topicName, threadCnt, countdown
+                    isExeuting, topicName, threadCnt, countdown
             ));
             threads.add(t);
         }
@@ -157,8 +157,8 @@ public class RedissonExample implements Example {
                 t.start();
             }
 
-            Thread.sleep(4000L);
-            runnable.compareAndSet(true, false);
+            Thread.sleep(1000L);
+            isExeuting.compareAndSet(true, false);
 
         } catch (InterruptedException e) {
             logger.error("", e);
@@ -168,7 +168,7 @@ public class RedissonExample implements Example {
     }
 
     // topic publisher
-    private void publisher(AtomicBoolean runnable, String topicName, int threadCnt, int countdown) {
+    private void publisher(AtomicBoolean isExeuting, String topicName, int threadCnt, int countdown) {
         // 퍼블리쉬 시작
         RedissonClient publishClient = create(mainHost);
 
@@ -178,7 +178,7 @@ public class RedissonExample implements Example {
             topics.add(topic);
         }
 
-        for (int i = 0; runnable.get() && i < countdown / threadCnt + 1; ++i) {
+        for (int i = 0; isExeuting.get() && i < countdown / threadCnt + 1; ++i) {
             topics.get(i % topics.size()).publishAsync("z");
             //publishTopic.publish("z");
 
@@ -193,5 +193,70 @@ public class RedissonExample implements Example {
         }
 
         publishClient.shutdown();
+    }
+
+    // https://github.com/redisson/redisson/wiki/7.-distributed-collections#74-sortedset
+    private void sortedSet(RedissonClient redisson) {
+        String name = "sortedSet";
+        RSortedSet<Integer> set = redisson.getSortedSet(name);
+        redisson.getBucket(name).expire(10, TimeUnit.SECONDS);
+
+        set.add(0);
+        set.add(3);
+        set.add(1);
+        set.add(2);
+        set.add(3);
+
+        set.add(5);
+
+        /*
+         * 입력값에 의한 정렬
+         * 중복값 안 들어감
+         */
+        logger.info("set entries - {}", set.readAll());
+    }
+
+
+    // https://github.com/redisson/redisson/wiki/7.-distributed-collections#75-scoredsortedset
+    private void scoredSortedSet(RedissonClient redisson) {
+        String name = "scoredSortedSet";
+        redisson.getBucket(name).delete();
+
+        RScoredSortedSet<String> set = redisson.getScoredSortedSet(name);
+        set.expire(10, TimeUnit.SECONDS);
+
+        long score = System.nanoTime();
+        for (int i = 0; i < 50; ++i) {
+            set.add(score - i, "A" + i);
+        }
+        int setSize = set.size();
+
+        // 총 엔트리
+        // 스코어가 작을 상위 랭크이므로, 올림차 정렬임을 알 수 있습니다.
+        logger.info("scored sorted set entries - size({}) entries({})", setSize, set.readAll());
+
+        int index = set.rank("A10");
+        logger.info("A10 rank - index({})", index);
+
+        long ascore = set.getScore("A10").longValue();
+        logger.info("A10 score - begin score({}) score({})", score, ascore);
+
+        // 주요 기능 : 페이지 단위로 얻어 올 수있음, 0 ~ 20 개이므로 총 21개
+        Collection<ScoredEntry<String>> entryGroup1 = set.entryRange(0, 20);
+        ArrayList<String> values = new ArrayList<>();
+        entryGroup1.forEach(entry -> values.add(entry.getValue()));
+        logger.info("scored sorted set group 1 entries - size({}) entries({})", entryGroup1.size(), values);
+
+        // 주요 기능 : 인덱스를 뒤집어(reversed) 가져 올 수 있음
+        Collection<ScoredEntry<String>> reversedEntryGroup = set.entryRangeReversed(0, 20);
+        ArrayList<String> reversedValues = new ArrayList<>();
+        reversedEntryGroup.forEach(entry -> reversedValues.add(entry.getValue()));
+        logger.info("scored sorted set group reversed entries - size({}) entries({})", reversedEntryGroup.size(), reversedValues);
+
+        // 인덱스를 벗어 났을 경우, 값을 가져 오지 않는다.
+        Collection<ScoredEntry<String>> emptyEntryGroup = set.entryRange(setSize, setSize + 20);
+        ArrayList<String> emptyValues = new ArrayList<>();
+        emptyEntryGroup.forEach(entry -> emptyValues.add(entry.getValue()));
+        logger.info("scored sorted set empty group entries - size({}) entries({})", emptyEntryGroup.size(), emptyValues);
     }
 }
