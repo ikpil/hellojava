@@ -2,6 +2,8 @@ package com.ikpil.hello.java;
 
 import org.redisson.Redisson;
 import org.redisson.api.*;
+import org.redisson.api.map.event.EntryEvent;
+import org.redisson.api.map.event.EntryExpiredListener;
 import org.redisson.client.RedisConnectionException;
 import org.redisson.client.protocol.ScoredEntry;
 import org.redisson.config.Config;
@@ -11,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -33,6 +34,7 @@ public class RedissonExample implements Example {
             consume(this::connectAndShutdown);
             consume(this::getOrSet);
             consume(this::publishOrSubscribe);
+            consume(this::map);
             consume(this::sortedSet);
             consume(this::scoredSortedSet);
         } catch (Exception e) {
@@ -193,6 +195,69 @@ public class RedissonExample implements Example {
         }
 
         publishClient.shutdown();
+    }
+
+    // 맵 사용 예제 추가
+    private void map(RedissonClient redisson) {
+        String name = "map";
+        redisson.getBucket(name).delete();
+
+        RMap<String, String> map = redisson.getMap(name);
+        map.expire(10, TimeUnit.SECONDS);
+
+        // 주요기능 : 넣을 때, 삭제 할 때 이전 값이 반환 됨을 알 수 있다.
+        {
+            String first = map.put("123", "prev");
+            String second = map.put("123", "current");
+            String third = map.remove("123");
+            logger.info("put & remove check - first({}) second({}) third({})", first, second, third);
+        }
+
+        // 주요 기능 : 같은 키에 값이 있을 때, 들어가지 않음을 알 수 있다.
+        {
+            String first = map.putIfAbsent("323", "prev");
+            String second = map.putIfAbsent("323", "current");
+            String third = map.remove("323");
+            logger.info("putIfAbsent & remove check - first({}) second({}) third({})", first, second, third);
+        }
+
+        // use fast* methods when previous value is not required
+        // 주요 기능 : 이전 값이 필요 없다면, fastPut 을 이용할 것
+
+        // 같은 값이 있을 경우, 넣어지지만 반환은 false 이다.
+        {
+            boolean first = map.fastPut("a", "fast put 1 of a");
+            boolean second = map.fastPut("a", "fast put 2 of a");
+            String v = map.get("a");
+            logger.info("fast put check - first({}) second({}) final value({})", first, second, v);
+        }
+
+        // 주요 기능 : 같은 값은 안 넣을 수 있고, 그 결과값을 받아서 볼 수 있다.
+        {
+            boolean first = map.fastPutIfAbsent("d", "fast put if absent 1 of d");
+            boolean second = map.fastPutIfAbsent("d", "fast put if absent 2 of d");
+            String v = map.get("d");
+            logger.info("fast put if absent check - first({}) second({}) value({})", first, second, v);
+        }
+
+        map.fastRemove("a", "d");
+
+        // 비동기 작업 테스트
+        {
+            RFuture<String> firstFuture = map.putAsync("321", "put async 1 of 321");
+            RFuture<Boolean> secondFuture = map.fastPutAsync("321", "fast put async 2 of 321");
+            RFuture<Boolean> thirdFuture = map.fastPutAsync("321", "fast put async 3 of 321");
+            RFuture<Long> fourFuture = map.fastRemoveAsync("321");
+            logger.info("asyc check - {}", map.readAllMap());
+
+            try {
+                fourFuture.await();
+            } catch (InterruptedException e) {
+                logger.error("", e);
+            }
+        }
+
+
     }
 
     // https://github.com/redisson/redisson/wiki/7.-distributed-collections#74-sortedset
