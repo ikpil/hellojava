@@ -12,6 +12,7 @@ public class ConsoleCommand {
         ArrayList<Example> examples = new ArrayList<>();
         examples.add(new CollectionExample());
         examples.add(new Log4J2Example());
+        examples.add(new TimeExample());
         examples.add(new RedissonExample());
 
         for (Example example : examples) {
