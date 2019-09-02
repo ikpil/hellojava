@@ -2,8 +2,6 @@ package com.ikpil.hello.java;
 
 import org.redisson.Redisson;
 import org.redisson.api.*;
-import org.redisson.api.map.event.EntryEvent;
-import org.redisson.api.map.event.EntryExpiredListener;
 import org.redisson.client.RedisConnectionException;
 import org.redisson.client.protocol.ScoredEntry;
 import org.redisson.config.Config;
@@ -27,7 +25,8 @@ import java.util.function.Consumer;
  */
 public class RedissonExample implements Example {
     private static final Logger logger = LoggerFactory.getLogger(RedissonExample.class);
-    private static final String mainHost = "redis://127.0.0.1:6379";
+    //private static final String mainHost = "redis://127.0.0.1:6379";
+    private static final String mainHost = "redis://192.168.0.240:6379";
 
     public void run() {
         try {
@@ -82,7 +81,6 @@ public class RedissonExample implements Example {
 
     // 케넥션 테스트, 할 일이 없다
     private void connectAndShutdown(RedissonClient redisson) {
-        // ....
     }
 
     // get set 예제
