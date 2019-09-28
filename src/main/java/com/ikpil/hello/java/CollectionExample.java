@@ -3,9 +3,7 @@ package com.ikpil.hello.java;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -41,7 +39,6 @@ public class CollectionExample implements Example {
         chm.put(key2, 2);
         chm.put(key3, 3);
         logger.info("thread safe hash map - {}", chm);
-
 
         ConcurrentSkipListMap<String, Integer> cslm = new ConcurrentSkipListMap<>();
         cslm.put(key1, 1);
