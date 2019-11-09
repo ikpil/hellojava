@@ -1,5 +1,8 @@
 package com.ikpil.hello.java.app;
 
+import com.ikpil.hello.java.core.CollectionExample;
+import com.ikpil.hello.java.core.Example;
+import com.ikpil.hello.java.core.Log4J2Example;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

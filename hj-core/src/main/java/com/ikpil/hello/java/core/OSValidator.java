@@ -1,4 +1,4 @@
-package com.ikpil.hello.java.app;
+package com.ikpil.hello.java.core;
 
 public class OSValidator {
 
