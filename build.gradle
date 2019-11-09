@@ -31,7 +31,7 @@ project(':hj-core') {
 
 }
 
-project(':hj-implement') {
+project(':hj-app') {
     dependencies {
         compile project(':hj-core')
     }

@@ -1,4 +1,4 @@
 rootProject.name = 'hellojava'
 
 include 'hj-core'
-include 'hj-implement'
+include 'hj-app'
