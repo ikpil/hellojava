@@ -1,7 +1,7 @@
 apply plugin: 'application'
 
 run {
-    mainClassName = 'Main'
+    mainClassName = 'com.ikpil.hello.java.app.Main'
 }
 
 dependencies {

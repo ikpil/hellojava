@@ -1,4 +1,4 @@
-package com.ikpil.hello.java.implement;
+package com.ikpil.hello.java.app;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ public class Main {
         ArrayList<Example> examples = new ArrayList<>();
         examples.add(new CollectionExample());
         examples.add(new Log4J2Example());
-        examples.add(new RedissonExample());
+        //examples.add(new RedissonExample());
 
         for (Example example : examples) {
             example.run();

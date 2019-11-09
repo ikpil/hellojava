@@ -1,4 +1,4 @@
-package com.ikpil.hello.java.implement;
+package com.ikpil.hello.java.app;
 
 import org.redisson.Redisson;
 import org.redisson.api.*;
