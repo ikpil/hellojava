@@ -1,34 +1,40 @@
-group 'com.ikpil.hello.java'
-version '1.0'
 
-apply plugin: 'java'
+allprojects {
+    group 'com.ikpil.hello.java'
+    version '1.0'
+}
 
-sourceCompatibility = 1.8
 
-jar {
-    manifest {
-        attributes 'Main-Class': 'com.ikpil.hello.java.ConsoleCommand'
-    }
+subprojects {
+    apply plugin: 'java'
 
-    from {
-        configurations.compile.collect {
-            it.isDirectory() ? it : zipTree(it)
+    sourceCompatibility = 1.8
+
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
+
+    jar {
+        from {
+            configurations.compile.collect {
+                it.isDirectory() ? it : zipTree(it)
+            }
         }
     }
+
+    repositories {
+        mavenCentral()
+    }
 }
 
-repositories {
-    mavenCentral()
+
+project(':hj-core') {
+
 }
 
-compileJava.options.encoding = "UTF-8"
-compileTestJava.options.encoding = "UTF-8"
-
-
-dependencies {
-    testCompile 'junit:junit:4.+'
-    compile 'org.apache.logging.log4j:log4j-api:+'
-    compile 'org.apache.logging.log4j:log4j-core:+'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:+'
-    compile 'org.redisson:redisson:+'
+project(':hj-implement') {
+    dependencies {
+        compile project(':hj-core')
+    }
 }
+
+

@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-public class ConsoleCommand {
+public class Main {
     private static final Logger logger = LoggerFactory.getLogger(ConsoleCommand.class);
 
     public static void main(String[] args) {

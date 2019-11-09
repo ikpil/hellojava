@@ -1,0 +1,13 @@
+apply plugin: 'application'
+
+run {
+    mainClassName = 'Main'
+}
+
+dependencies {
+    testCompile 'junit:junit:4.+'
+    compile 'org.apache.logging.log4j:log4j-api:+'
+    compile 'org.apache.logging.log4j:log4j-core:+'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:+'
+    compile 'org.redisson:redisson:+'
+}
