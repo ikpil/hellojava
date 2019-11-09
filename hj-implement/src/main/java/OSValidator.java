@@ -1,5 +1,3 @@
-package com.ikpil.hello.java;
-
 public class OSValidator {
 
     private static String osName = System.getProperty("os.name").toLowerCase();

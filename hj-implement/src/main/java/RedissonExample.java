@@ -1,5 +1,3 @@
-package com.ikpil.hello.java;
-
 import org.redisson.Redisson;
 import org.redisson.api.*;
 import org.redisson.client.RedisConnectionException;
