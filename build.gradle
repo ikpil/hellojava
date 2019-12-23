@@ -7,6 +7,7 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'java-library'
 
     sourceCompatibility = 11
 
@@ -15,6 +16,10 @@ subprojects {
 
     repositories {
         mavenCentral()
+    }
+
+    test {
+        useJUnitPlatform()
     }
 }
 
@@ -25,7 +30,7 @@ project(':hj-core') {
 
 project(':hj-app') {
     dependencies {
-        compile project(':hj-core')
+        api project(':hj-core')
     }
 }
 

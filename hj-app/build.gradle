@@ -5,17 +5,18 @@ run {
 }
 
 jar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE // allow duplicates
     from {
-        configurations.compile.collect {
+        configurations.compileClasspath.collect {
             it.isDirectory() ? it : zipTree(it)
         }
     }
 }
 
 dependencies {
-    testCompile 'junit:junit:4.+'
-    compile 'org.apache.logging.log4j:log4j-api:+'
-    compile 'org.apache.logging.log4j:log4j-core:+'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:+'
-    compile 'org.redisson:redisson:+'
+    testImplementation 'junit:junit:4.+'
+    implementation 'org.apache.logging.log4j:log4j-api:+'
+    implementation 'org.apache.logging.log4j:log4j-core:+'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:+'
+    implementation 'org.redisson:redisson:+'
 }
