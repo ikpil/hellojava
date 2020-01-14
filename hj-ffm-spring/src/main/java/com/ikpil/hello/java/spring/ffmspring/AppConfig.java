@@ -7,6 +7,12 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
     @Bean
     Calculator calculator() {
+        System.out.println("return new AddCalculator() -----");
         return new AddCalculator();
+    }
+
+    @Bean
+    ArgumentResolver argumentResolver() {
+        return new ScannerArgumentResolver();
     }
 }

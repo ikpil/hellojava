@@ -13,6 +13,7 @@ public class App {
         try (var context = SpringApplication.run(App.class, args)) {
             var scanner = new Scanner(System.in);
             System.out.print("Enter 2 numbers like `a b` : ");
+            context.getBean(ArgumentResolver.class);
             int a = scanner.nextInt();
             int b = scanner.nextInt();
 
