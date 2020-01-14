@@ -1,4 +1,4 @@
-package com.ikpil.hello.java.spring.ffmspring;
+package com.ikpil.hello.java.spring.ffmspring.app;
 
 import java.io.InputStream;
 
