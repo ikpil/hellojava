@@ -4,24 +4,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
-import java.util.Scanner;
-
 @EnableAutoConfiguration
 @Import(AppConfig.class)
 public class App {
     public static void main(String[] args) {
         try (var context = SpringApplication.run(App.class, args)) {
-            var scanner = new Scanner(System.in);
-            System.out.print("Enter 2 numbers like `a b` : ");
-            context.getBean(ArgumentResolver.class);
-            int a = scanner.nextInt();
-            int b = scanner.nextInt();
-
-            Calculator calculator = context.getBean(Calculator.class);
-            Calculator calculator2 = context.getBean(Calculator.class);
-
-            int result = calculator.calc(a, b);
-            System.out.println("result = " + result);
+            var frontend = context.getBean(Frontend.class);
+            frontend.run();
         }
     }
 }
