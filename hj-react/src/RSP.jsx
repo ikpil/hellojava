@@ -1,6 +1,4 @@
-const React = require('react');
-const { Component } = React;
-const { useState, useRef, useEffect } = React;
+import React, { Component, useState, useRef, useEffect } from 'react';
 
 // 클래스의 경우
 // 최초 생성 될 때 -> constructor -> render -> ref -> componentDidMount -> 
