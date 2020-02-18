@@ -27,6 +27,15 @@ const Lotto = () => {
 
     const timeouts = useRef([]);
 
+    const mounted = useRef(false);
+    useEffect(() => {
+        if (!mounted.current) {
+            mounted.current = true;
+        } else {
+            // ajax
+        }
+    }, []); // component did update ok, component did mount x
+
     useEffect(() => {
         for (let i = 0; i < winNumbers.length - 1; ++i) {
             timeouts.current[i] = setTimeout(() => {
