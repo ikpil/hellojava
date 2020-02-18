@@ -1,5 +1,4 @@
-const React = require('react');
-const { PureComponent } = React;
+import React, { PureComponent } from 'react';
 
 class RenderTest extends PureComponent {
   state = {
