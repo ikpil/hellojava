@@ -1,6 +1,4 @@
-const React = require('react');
-
-const { memo } = React;
+import React, { memo } from 'react';
 
 const Try = memo(({ tryInfo }) => {
   return (
