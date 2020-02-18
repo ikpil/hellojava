@@ -1,7 +1,5 @@
-const React = require('react');
-
-const { memo, useState, useRef } = React;
-const Try = require('./Try');
+import React, { memo, useState, useRef } from 'react';
+import Try from './Try';
 
 function getNumbers() {
   const candidate = [1, 2, 3, 4, 5, 6, 7, 8, 9];
