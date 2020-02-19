@@ -7,9 +7,11 @@ const initialState = {
     tableData: [['', '', ''], ['', '', ''], ['', '', '']],
 };
 
+const SET_WINNER = 'SET_WINNER';
+
 const reducer = (state, action) => {
     switch (action.type) {
-        case 'SET_WINNER':
+        case SET_WINNER:
             return {
                 ...state,
                 winner: action.winner
@@ -24,7 +26,7 @@ const TicTacToe = () => {
     // const [tabledata, setTableData] = useState([['', '', ''], ['', '', ''], ['', '', '']])
 
     const onClickTable = useCallback(() => {
-        dispatch({ type: 'SET_WINNER', winner: 'O'});
+        dispatch({ type: SET_WINNER, winner: 'O'});
     }, []);
 
     return (
