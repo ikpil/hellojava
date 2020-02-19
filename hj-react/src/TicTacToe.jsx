@@ -31,7 +31,7 @@ const TicTacToe = () => {
 
     return (
         <>
-            <Table onClick={onClickTable}/>
+            <Table onClick={onClickTable} tableData={state.tableData}/>
             {state.winner && <div>{state.winner}님의 승리</div>}
         </>
     );
