@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import { hot } from 'react-hot-loader/root';
-import Lotto from './Lotto';
+import TicTacToe from './TicTacToe';
 
-const HotLoader = hot(Lotto);
+const HotLoader = hot(TicTacToe);
 
 ReactDom.render(<HotLoader />, document.querySelector('#root'));

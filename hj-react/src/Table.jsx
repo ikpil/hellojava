@@ -1,9 +1,11 @@
 import React from 'react';
 import Tr from './Tr';
 
-const Table = () => {
+const Table = ({ onClick }) => {
     return (
-        <Tr>{''}</Tr>
+        <table onClick={onClick}>
+            <Tr>{''}</Tr>
+        </table>
     )
 }
 
