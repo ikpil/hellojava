@@ -1,10 +1,10 @@
 import React, { memo, useContext } from 'react';
 import Td from './Td';
 
-const Tr = ({rowData}) => {
+const Tr = ({ dispatch, rowIndex, rowData }) => {
     return (
         <tr>
-            {Array(rowData.length).fill().map(td => <Td />)}
+            {Array(rowData.length).fill().map((td, i) => <Td dispatch={dispatch} rowIndex={rowIndex} cellIndex={i}/>)}
         </tr>
     );
 }
