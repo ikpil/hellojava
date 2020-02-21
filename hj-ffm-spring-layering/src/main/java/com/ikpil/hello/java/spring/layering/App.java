@@ -19,7 +19,11 @@ public class App implements CommandLineRunner {
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
 
-    public void run_bak(String... strings) throws Exception {
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
+
+    public void run_step1(String... strings) throws Exception {
         customerService.save(new Customer(1, "Nobita", "Nobi"));
         customerService.save(new Customer(2, "Takeshi", "Goda"));
         customerService.save(new Customer(3, "Suneo", "Honekawa"));
@@ -27,8 +31,7 @@ public class App implements CommandLineRunner {
         customerService.findAll().forEach(System.out::println);
     }
 
-    @Override
-    public void run(String... strings) throws Exception {
+    public void run_step2(String... strings) throws Exception {
         String sql = "SELECT :a + :b";
         var param = new MapSqlParameterSource()
                 .addValue("a", 100)
@@ -39,7 +42,18 @@ public class App implements CommandLineRunner {
         System.out.println("result = " + result);
     }
 
-    public static void main(String[] args) {
-        SpringApplication.run(App.class, args);
+    @Override
+    public void run(String... strings) throws Exception {
+        String sql = "SELECT * FROM `customers` WHERE `id` = :id";
+        var param = new MapSqlParameterSource()
+                .addValue("id", 1);
+
+        var result = jdbcTemplate.queryForObject(sql, param, (rs, num) -> new Customer(
+                rs.getInt("id"),
+                rs.getString("first_name"),
+                rs.getString("last_name")
+        ));
+
+        System.out.println("result = " + result);
     }
 }
