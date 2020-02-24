@@ -1,6 +1,5 @@
 package com.ikpil.hello.java.spring.layering;
 
-import net.sf.log4jdbc.Log4jdbcProxyDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -26,6 +25,6 @@ public class AppConfig {
                 .password(this.dataSourceProperties.getPassword());
 
         this.dataSource = factory.build();
-        return new Log4jdbcProxyDataSource(this.dataSource);
+        return new net.sf.log4jdbc.sql.jdbcapi.DataSourceSpy(this.dataSource);
     }
 }
