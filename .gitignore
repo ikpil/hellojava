@@ -4,4 +4,4 @@
 
 logs
 **/build/
-testdb.mv.db
+testdb.*.db
