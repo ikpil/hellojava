@@ -4,5 +4,4 @@ include 'hj-core'
 include 'hj-app'
 include 'hj-spring'
 include 'hj-ffm-spring'
-include 'hj-ffm-spring-layering'
 
